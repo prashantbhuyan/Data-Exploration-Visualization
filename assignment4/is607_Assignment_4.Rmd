@@ -1,0 +1,58 @@
+Prashant B. Bhuyan
+
+is607 assignment 4
+
+========================================================
+
+First I import the ggplot2 and plyr libraries.  Then I save the movies data set to a data frame called df.  I then split that df into a data frame called split.df which contains the vectors year, rating and votes.  I then rename the columns of split.df "year", "rating" and "votes".  
+
+Next, I create a data frame called combined which contains vectors for the year in which the movie was produced and another vector called product which is the product of the rating and the number of votes for each movie produced.  In order to get the product I cast both rating and votes from string to double types by using the as.numeric() function call. The main concept behind product is that the highest avg rating * the highest number of votes will yield the largest number.  If I can reduce the number of columns down to year and product then finding the max will be easy after I group according to yea
+
+Next, I want to group the data in the combined data frame by year and I want to find out what the mean 'product' was for all the movies produced in a given year.  To do this I use the ddply to group by the "year" column and find the mean "product" of each group.  
+
+Finally, I rename the columns of the grouped data frame to "year" and "average product".  I then call which.max() and pass in the avg product column of the grouped data frame which returns to me the row that contains the max average product.  The answer I get is row 107.  Row 107 shows that '107  1999  9456.17244' 1999 was the year which produced the highest rated movies that were also the most popular.  In other words the 'best popular' movies were created in 1999.
+
+The R Code that supports my conclusions is below.
+
+
+```{r}
+library(ggplot2)
+library(plyr)
+df <- data(movies)
+split.df <- data.frame(movies$year, movies$rating, movies$votes)
+colnames(split.df) <- c("year", "rating", "votes")
+combined <- data.frame(split.df$year, (as.numeric(split.df$rating)*as.numeric(split.df$votes)))
+colnames(combined) <- c("year", "avgproduct")
+grouped <- ddply(combined, c("year"), summarize, avgproduct = mean(avgproduct))
+best.popular <- which.max(grouped$avgproduct)
+print("The year that produced the best popular movies was: ") 
+print(grouped$year[best.popular])
+print("and the row is: ")
+print(grouped[best.popular,])
+```
+
+The output from this program is:
+
+> print("The year that produced the best popular movies was: ") 
+[1] "The year that produced the best popular movies was: "
+> print(grouped$year[best.popular])
+[1] 1999
+> print("and the row is: ")
+[1] "and the row is: "
+> print(grouped[best.popular,])
+    year avgproduct
+107 1999   9456.172
+
+Please see the two attached images for the visualization that supports my conclusion. From the scatter plot that pits avg rating per movie against year in which movie was produced we see that the size of the dots varies by the number of votes.  As such the largest dots are most concentrated in the late 1980s and the around the turn of the century through the 2000s.  
+
+From our algorithm above we know that the 1999 produced the Best Popular Movies of the given data set.  Indeed in the second image "Avg Product (Rating x Votes) of Movies by Year" we see clearly that the turn of the century and more specifically 1999 produced the largest dot.
+
+```{r}
+best.popular.viz <- ggplot(split.df, aes(x = rating, y = year)) + geom_point(aes(size = votes), color = "black") + scale_size(range = c(1,10)) + labs(title = "Best Popular Movies Through the Years", x = "Avg Rating per Movie", y = "Year Movie Was Produced")
+best.popular.viz
+
+best.popular.product.viz <- ggplot(grouped, aes(x = year, y = avgproduct)) + geom_point(aes(size = avgproduct), color = "red") + scale_size(range = c(1,10)) + labs(title = "Avg Product (Rating x Votes) of Movies by Year", x= "Year", y = "Avg Product (Rating X Votes)")
+best.popular.product.viz
+
+```
+
