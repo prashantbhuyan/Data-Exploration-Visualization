@@ -1,5 +1,5 @@
 # Prashant B. Bhuyan
-# is607 Quiz Week 4 Quiz
+# Exploration & Visualization IMBD Database
 
 ##### Problem 1 #####
 
